@@ -112,7 +112,6 @@ const DashboardAggregatedTable: React.FC<DashboardAggregatedTableProps> = ({
       }
       return item;
     });
-    console.log(newItems);
     onAggregatedDataChange(newItems);
   };
 

@@ -27,7 +27,6 @@ const DashboardGroupTable: React.FC<DashboardGroupTableProps> = ({
   const [showError, setShowError] = useState(false);
 
   const databaseColumn = getDatabaseColumnList();
-  console.log(databaseColumn.map((i) => i?.databaseColumn));
 
   const handleDragEnd = (result: DropResult) => {
     const { source, destination } = result;

@@ -1,7 +1,5 @@
 import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { QUERY_KEYS } from "@/constants/queryKeys";
-import { statsService } from "@/services/stats/api";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface UseStatsRefreshOptions {
   dashboardId: string;
@@ -13,9 +11,6 @@ interface UseStatsRefreshOptions {
 }
 
 export const useStatsRefresh = ({
-  dashboardId,
-  startDate,
-  endDate,
   onSuccess,
   onError,
   minRefreshTime = 1200,
@@ -24,28 +19,6 @@ export const useStatsRefresh = ({
   const [isLoading, setIsLoading] = useState(false);
   const [remainingTime, setRemainingTime] = useState(60);
   const queryClient = useQueryClient();
-
-  // selectGroupData는 빈 문자열로 설정 (StatsItemPage에서 관리)
-  const { status, error, data } = useQuery({
-    queryKey: QUERY_KEYS.STATISTICS.GROUP({
-      dashboardId,
-      selectGroupData: "",
-      startDate,
-      endDate,
-    }),
-    queryFn: () =>
-      statsService.getGroupDataStatistics({
-        dashboardId,
-        selectGroupData: "", // 기본값
-        startDate,
-        endDate,
-      }),
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 10,
-    retry: 1,
-    refetchOnWindowFocus: false,
-    enabled: !!dashboardId,
-  });
 
   const resetTimers = () => {
     setRemainingTime(60);
@@ -64,9 +37,13 @@ export const useStatsRefresh = ({
     const start = Date.now();
 
     try {
-      // 모든 statistics 관련 쿼리를 새로고침
+      await queryClient.invalidateQueries({
+        queryKey: ["STATISTICS"],
+      });
+
       await queryClient.refetchQueries({
         queryKey: ["STATISTICS"],
+        type: "active",
       });
 
       const elapsed = Date.now() - start;
@@ -93,17 +70,14 @@ export const useStatsRefresh = ({
     setRemainingTime(intervalSeconds);
   };
 
-  console.log(data);
-
   return {
     isRefreshing,
     isLoading,
     remainingTime,
     refreshStats,
     setRemainingTime,
-    statsData: data,
-    isError: status === "error",
-    error: error as Error | null,
+    isError: false,
+    error: null,
     startAutoRefreshTimer,
   };
 };

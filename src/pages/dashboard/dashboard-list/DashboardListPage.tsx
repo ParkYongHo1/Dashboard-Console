@@ -30,7 +30,6 @@ const DashboardListPage = () => {
       />
     );
   }
-  console.log(data);
 
   return (
     <div className="m-auto w-full h-[90vh] py-6">

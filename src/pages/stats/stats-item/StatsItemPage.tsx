@@ -37,6 +37,7 @@ const StatsItemPage = () => {
   const [aggregatedGroupItem, setAggregatedGroupItem] = useState<string>("");
   const [aggregatedItem, setAggregatedItem] = useState<string>("");
   const [dateRange, setDateRange] = useState(getInitialDateRange());
+  const [refreshKey, setRefreshKey] = useState(0); // 차트 강제 리렌더링용
 
   const { dashboardId } = useParams<{ dashboardId: string }>();
 
@@ -104,6 +105,7 @@ const StatsItemPage = () => {
     aggregatedDataList?: number[];
   };
 
+  // 그룹항목용 데이터
   const { data: groupFilterData, refetch: refetchGroupFilterData } =
     useQuery<FilterData | null>({
       queryKey: QUERY_KEYS.STATISTICS.GROUP({
@@ -125,6 +127,7 @@ const StatsItemPage = () => {
       enabled: Boolean(dashboardId && groupItem),
     });
 
+  // 집계항목용 데이터
   const { data: aggregatedFilterData, refetch: refetchAggregatedFilterData } =
     useQuery<FilterData | null>({
       queryKey: QUERY_KEYS.STATISTICS.AGGREGATE({
@@ -149,6 +152,7 @@ const StatsItemPage = () => {
       enabled: Boolean(dashboardId && aggregatedGroupItem && aggregatedItem),
     });
 
+  // 그룹항목 차트 데이터
   const groupChartData = useMemo(() => {
     if (!groupFilterData?.groupDataList) return [];
 
@@ -166,7 +170,11 @@ const StatsItemPage = () => {
         value: value,
       })
     );
-  }, [groupFilterData, dashboardData?.dashboardDetailInfo.groupData]);
+  }, [
+    groupFilterData,
+    dashboardData?.dashboardDetailInfo.groupData,
+    refreshKey,
+  ]);
 
   // 집계항목 차트 데이터 (수정: aggregatedDataList 사용)
   const aggregatedChartData = useMemo(() => {
@@ -186,7 +194,11 @@ const StatsItemPage = () => {
         value: value,
       })
     );
-  }, [aggregatedFilterData, dashboardData?.dashboardDetailInfo.groupData]);
+  }, [
+    aggregatedFilterData,
+    dashboardData?.dashboardDetailInfo.groupData,
+    refreshKey,
+  ]);
 
   // StatsHeader에서 새로고침 기능을 처리하므로 여기서는 항목 변경시에만 API 호출
   useEffect(() => {
@@ -232,7 +244,12 @@ const StatsItemPage = () => {
 
     switch (groupChartType) {
       case "donut":
-        return <DonutChartComponent data={groupChartData} />;
+        return (
+          <DonutChartComponent
+            key={`group-${refreshKey}`}
+            data={groupChartData}
+          />
+        );
       case "bar":
         return (
           <div className="mt-4 p-4 bg-gray-50 rounded-lg text-center">
@@ -252,7 +269,12 @@ const StatsItemPage = () => {
           </div>
         );
       default:
-        return <DonutChartComponent data={groupChartData} />;
+        return (
+          <DonutChartComponent
+            key={`group-${refreshKey}`}
+            data={groupChartData}
+          />
+        );
     }
   };
 
@@ -271,7 +293,12 @@ const StatsItemPage = () => {
 
     switch (aggregatedChartType) {
       case "donut":
-        return <DonutChartComponent data={aggregatedChartData} />;
+        return (
+          <DonutChartComponent
+            key={`aggregated-${refreshKey}`}
+            data={aggregatedChartData}
+          />
+        );
       case "bar":
         return (
           <div className="mt-4 p-4 bg-gray-50 rounded-lg text-center">
@@ -291,7 +318,12 @@ const StatsItemPage = () => {
           </div>
         );
       default:
-        return <DonutChartComponent data={aggregatedChartData} />;
+        return (
+          <DonutChartComponent
+            key={`aggregated-${refreshKey}`}
+            data={aggregatedChartData}
+          />
+        );
     }
   };
 
@@ -303,10 +335,21 @@ const StatsItemPage = () => {
           endDate={dateRange.endDate}
           onDateChange={handleDateChange}
           onRefresh={async () => {
-            await Promise.all([
-              refetchGroupFilterData(),
-              refetchAggregatedFilterData(),
-            ]);
+            const promises = [];
+
+            if (dashboardId && groupItem) {
+              promises.push(refetchGroupFilterData());
+            }
+
+            if (dashboardId && aggregatedGroupItem && aggregatedItem) {
+              promises.push(refetchAggregatedFilterData());
+            }
+
+            await Promise.all(promises);
+          }}
+          onForceUpdate={() => {
+            // 차트 강제 리렌더링을 위한 key 업데이트
+            setRefreshKey((prev) => prev + 1);
           }}
         />
       </div>

@@ -56,7 +56,6 @@ const refreshAccessToken = async () => {
       response.accessToken,
       response.accessTokenExpiresAt
     );
-    console.log(response.accessTokenExpiresAt);
 
     console.log(
       "✅ 사전 토큰 갱신 완료",

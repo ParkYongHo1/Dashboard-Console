@@ -47,7 +47,6 @@ const LoginPage = () => {
       };
 
       login(companyInfo, tokens);
-      console.log(response);
 
       navigate("/");
     },

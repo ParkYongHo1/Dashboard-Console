@@ -11,14 +11,15 @@ interface StatsHeaderProps {
   startDate: Date;
   endDate: Date;
   onDateChange: (startDate: Date, endDate: Date) => void;
-  onRefresh?: () => Promise<void>; // 추가된 prop
+  onRefresh?: () => Promise<void>;
+  onForceUpdate?: () => void;
 }
 
 const StatsHeader = ({
   startDate,
   endDate,
   onDateChange,
-  onRefresh, // 추가된 prop
+  onRefresh,
 }: StatsHeaderProps) => {
   const { dashboardId } = useParams<{ dashboardId: string }>();
   const [autoRefresh, setAutoRefresh] = useState(false);
@@ -29,9 +30,6 @@ const StatsHeader = ({
       dashboardId: dashboardId || "",
       startDate,
       endDate,
-      onSuccess: () => {
-        console.log("Refresh successful");
-      },
       onError: (error) => {
         alert(`새로고침에 실패했습니다.\n${error.message}`);
       },
@@ -69,6 +67,8 @@ const StatsHeader = ({
     if (onRefresh) {
       await onRefresh();
     }
+    // useStatsRefresh의 refreshStats도 호출하여 전체 새로고침 실행
+    await refreshStats(autoRefreshActive);
   };
 
   return (
