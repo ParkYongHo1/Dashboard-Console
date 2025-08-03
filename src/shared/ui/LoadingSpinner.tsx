@@ -15,7 +15,7 @@ export const LoadingSpinner = ({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setRotation((prev) => (prev + 15) % 360);
+      setRotation((prev) => (prev + 5) % 360);
     }, 10);
 
     return () => clearInterval(interval);

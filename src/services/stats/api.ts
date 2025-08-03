@@ -1,35 +1,49 @@
-// import { apiClient } from "@/lib/interceptors";
+import { apiClient } from "@/lib/interceptors";
 
-// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+const formatDateToISOStringNoSeconds = (date: Date): string => {
+  return date.toISOString().slice(0, 16); // "2025-11-24T18:00"
+};
 
 export const statsService = {
-  getStatistics: async (params: {
+  getGroupDataStatistics: async (params: {
     dashboardId: string;
     selectGroupData: string;
     startDate: Date;
     endDate: Date;
   }) => {
-    // 더미 데이터 반환 (API 문제로 인한 임시 처리)
-    console.log(params.selectGroupData);
+    const startDateStr = formatDateToISOStringNoSeconds(params.startDate);
+    const endDateStr = formatDateToISOStringNoSeconds(params.endDate);
 
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          groupDataList: [2, 1, 1],
-        });
-      }, 500); // 0.5초 지연으로 실제 API 호출을 시뮬레이션
-    });
+    const url = `${API_BASE_URL}/api/filterGroupData?dashboardId=${decodeURIComponent(
+      params.dashboardId
+    )}&selectGroupData=${encodeURIComponent(
+      params.selectGroupData
+    )}&startDate=${startDateStr}&endDate=${endDateStr}`;
 
-    //   const startDateStr = params.startDate.toISOString();
-    //   const endDateStr = params.endDate.toISOString();
+    const response = await apiClient.get(url);
+    return response.data;
+  },
+  getAggregatedDataStatistics: async (params: {
+    dashboardId: string;
+    selectGroupData: string;
+    selectAggregatedData: string;
+    startDate: Date;
+    endDate: Date;
+  }) => {
+    const startDateStr = formatDateToISOStringNoSeconds(params.startDate);
+    const endDateStr = formatDateToISOStringNoSeconds(params.endDate);
 
-    //   const url = `${API_BASE_URL}/api/filterGroupData?dashboardId=${decodeURIComponent(
-    //     params.dashboardId
-    //   )}&selectGroupData=${encodeURIComponent(
-    //     params.selectGroupData
-    //   )}&startDate=${startDateStr}&endDate=${endDateStr}`;
+    const url = `${API_BASE_URL}/api/filterData?dashboardId=${decodeURIComponent(
+      params.dashboardId
+    )}&selectGroupData=${encodeURIComponent(
+      params.selectGroupData
+    )}&selectAggregatedData=${encodeURIComponent(
+      params.selectAggregatedData
+    )}&startDate=${startDateStr}&endDate=${endDateStr}`;
 
-    //   const response = await apiClient.get(url);
-    //   return response.data;
+    const response = await apiClient.get(url);
+    return response.data;
   },
 };

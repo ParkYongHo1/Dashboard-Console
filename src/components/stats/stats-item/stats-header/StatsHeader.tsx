@@ -11,12 +11,14 @@ interface StatsHeaderProps {
   startDate: Date;
   endDate: Date;
   onDateChange: (startDate: Date, endDate: Date) => void;
+  onRefresh?: () => Promise<void>; // 추가된 prop
 }
 
 const StatsHeader = ({
   startDate,
   endDate,
   onDateChange,
+  onRefresh, // 추가된 prop
 }: StatsHeaderProps) => {
   const { dashboardId } = useParams<{ dashboardId: string }>();
   const [autoRefresh, setAutoRefresh] = useState(false);
@@ -37,14 +39,19 @@ const StatsHeader = ({
 
   // 날짜 변경 시 자동으로 데이터 조회 (dashboardId가 있을 때만)
   useEffect(() => {
-    if (dashboardId) {
-      refreshStats();
+    if (dashboardId && onRefresh) {
+      onRefresh();
     }
   }, [startDate, endDate, dashboardId]);
 
   useAutoRefreshTimer({
     autoRefresh,
-    refreshStats,
+    refreshStats: async () => {
+      // StatsItemPage의 refetch 함수들 호출
+      if (onRefresh) {
+        await onRefresh();
+      }
+    },
     setRemainingTime,
   });
 
@@ -55,6 +62,13 @@ const StatsHeader = ({
 
   const handleEndDateChange = (newEndDate: Date) => {
     onDateChange(startDate, newEndDate);
+  };
+
+  // RefreshButton에서 사용할 새로고침 함수
+  const handleRefreshStats = async (autoRefreshActive?: boolean) => {
+    if (onRefresh) {
+      await onRefresh();
+    }
   };
 
   return (
@@ -90,7 +104,7 @@ const StatsHeader = ({
         />
         <RefreshButton
           autoRefresh={autoRefresh}
-          refreshStats={refreshStats}
+          refreshStats={handleRefreshStats}
           isRefreshing={isRefreshing}
           onRefreshStarted={() => setRemainingTime(60)}
           onRefreshCompleted={() => setRemainingTime(60)}

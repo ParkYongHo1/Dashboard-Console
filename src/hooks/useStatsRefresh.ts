@@ -27,14 +27,14 @@ export const useStatsRefresh = ({
 
   // selectGroupData는 빈 문자열로 설정 (StatsItemPage에서 관리)
   const { status, error, data } = useQuery({
-    queryKey: QUERY_KEYS.STATISTICS.GET({
+    queryKey: QUERY_KEYS.STATISTICS.GROUP({
       dashboardId,
       selectGroupData: "",
       startDate,
       endDate,
     }),
     queryFn: () =>
-      statsService.getStatistics({
+      statsService.getGroupDataStatistics({
         dashboardId,
         selectGroupData: "", // 기본값
         startDate,
