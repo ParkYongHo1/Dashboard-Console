@@ -18,6 +18,8 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": "./src",
     "paths": {
+      "@/app/*": ["./app/*"],
+      "@/feature/*": ["./feature/*"],
       "@/components/*": ["./components/*"],
       "@/constants/*": ["./constants/*"],
       "@/hooks/*": ["./hooks/*"],
