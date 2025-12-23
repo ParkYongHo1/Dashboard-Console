@@ -12,35 +12,18 @@ export const refreshAccessToken = async (set: StateUpdater, get: StateGetter): P
     if (!store.refreshToken) {
       handleSessionExpired(store);
     }
+    console.log("test");
 
     const response = await tokenService.refresh(store.refreshToken!);
 
     set({
       accessToken: response.accessToken,
       accessTokenExpiresAt: response.accessTokenExpiresAt,
+      isRefreshing: false,
     });
-
-    scheduleTokenRefresh(set, get);
+    get().scheduleTokenRefresh();
   } catch {
-    handleSessionExpired(store);
-  } finally {
     set({ isRefreshing: false });
+    handleSessionExpired(store);
   }
-};
-
-export const scheduleTokenRefresh = (set: StateUpdater, get: StateGetter): void => {
-  const state = get();
-  if (!state.accessTokenExpiresAt || state.isRefreshing) return;
-
-  const now = Date.now();
-  const refreshTime = state.accessTokenExpiresAt - 30 * 1000;
-
-  if (now >= refreshTime) {
-    refreshAccessToken(set, get);
-    return;
-  }
-
-  const timer = setTimeout(() => refreshAccessToken(set, get), refreshTime - now);
-
-  set({ refreshTimer: timer });
 };

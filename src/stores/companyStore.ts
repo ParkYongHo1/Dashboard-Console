@@ -33,6 +33,9 @@ interface CompanyState {
   scheduleTokenRefresh: () => void;
   clearRefreshTimer: () => void;
   setRefreshing: (isRefreshing: boolean) => void;
+
+  _testForceTokenExpiry?: (secondsUntilExpiry: number) => void;
+  _testRefreshNow?: () => Promise<void>;
 }
 
 export const useCompanyStore = create<CompanyState>()(
@@ -90,16 +93,31 @@ export const useCompanyStore = create<CompanyState>()(
       },
 
       scheduleTokenRefresh: () => {
-        const { accessTokenExpiresAt, refreshTimer, isRefreshing } = get();
+        const { accessTokenExpiresAt, refreshTimer, isRefreshing, refreshToken } = get();
 
-        if (!accessTokenExpiresAt || isRefreshing) return;
+        if (!accessTokenExpiresAt || !refreshToken || isRefreshing) {
+          return;
+        }
 
-        if (refreshTimer) clearTimeout(refreshTimer);
+        if (refreshTimer) {
+          clearTimeout(refreshTimer);
+          set({ refreshTimer: null });
+        }
 
-        const refreshTime = accessTokenExpiresAt - 30 * 1000;
         const now = Date.now();
+        const refreshTime = accessTokenExpiresAt - 30 * 1000;
 
-        const timer = setTimeout(() => refreshAccessToken(set, get), refreshTime - now);
+        if (now >= refreshTime) {
+          refreshAccessToken(set, get);
+          return;
+        }
+
+        const delay = refreshTime - now;
+
+        const timer = setTimeout(() => {
+          refreshAccessToken(set, get);
+        }, delay);
+
         set({ refreshTimer: timer });
       },
 
