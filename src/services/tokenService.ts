@@ -11,8 +11,8 @@ export const refreshAccessToken = async (set: StateUpdater, get: StateGetter): P
 
     if (!store.refreshToken) {
       handleSessionExpired(store);
+      return;
     }
-    console.log("test");
 
     const response = await tokenService.refresh(store.refreshToken!);
 
@@ -27,3 +27,4 @@ export const refreshAccessToken = async (set: StateUpdater, get: StateGetter): P
     handleSessionExpired(store);
   }
 };
+
