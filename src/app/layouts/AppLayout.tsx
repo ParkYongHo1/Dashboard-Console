@@ -1,11 +1,18 @@
-import Footer from "@/components/common/Footer/Footer";
+import { useDevice } from "@/shared/hooks/useDevice";
 import { useTheme } from "@/shared/hooks/useTheme";
+import { Footer } from "@/widgets/footer/ui/Footer";
 import { Header } from "@/widgets/header/ui/Header";
+import { Mobile } from "@/widgets/mobile/Mobile";
 import { Moon, Sun } from "lucide-react";
 import { Outlet } from "react-router-dom";
 
 export const AppLayout = () => {
   const { theme, toggleTheme } = useTheme();
+  const { isMobile } = useDevice();
+
+  if (isMobile) {
+    return <Mobile />;
+  }
 
   return (
     <main className="bg-white">

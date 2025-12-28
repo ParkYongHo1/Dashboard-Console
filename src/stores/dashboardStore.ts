@@ -1,4 +1,3 @@
-// stores/dashboardStore.ts
 import { create } from "zustand";
 
 export interface DatabaseColumn {
@@ -55,22 +54,18 @@ export interface DashboardState {
   groupItems: GroupItem[];
   aggregatedItems: AggregatedData[];
 
-  // 로딩 상태
   isLoading: boolean;
 
-  // 액션들
   setCurrentDashboard: (data: DashboardData) => void;
   setDashboardDefaultInfo: (info: DashboardDefaultInfo) => void;
   setDashboardDetailInfo: (info: DashboardDetailInfo) => void;
 
-  // 그룹 항목 관련 액션들
   setGroupItems: (items: GroupItem[]) => void;
   addGroupItem: (item: GroupItem) => void;
   updateGroupItem: (id: number, updates: Partial<GroupItem>) => void;
   deleteGroupItem: (id: number) => void;
   reorderGroupItems: (startIndex: number, endIndex: number) => void;
 
-  // 집계 항목 관련 액션들
   setAggregatedItems: (items: AggregatedData[]) => void;
   addAggregatedItem: (item: AggregatedData) => void;
   updateAggregatedItem: (id: number, updates: Partial<AggregatedData>) => void;
@@ -96,19 +91,13 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
 
   setDashboardDefaultInfo: (info) =>
     set((state) => ({
-      currentDashboard: state.currentDashboard
-        ? { ...state.currentDashboard, dashboardDefaultInfo: info }
-        : null,
+      currentDashboard: state.currentDashboard ? { ...state.currentDashboard, dashboardDefaultInfo: info } : null,
     })),
 
   setDashboardDetailInfo: (info) =>
     set((state) => ({
-      currentDashboard: state.currentDashboard
-        ? { ...state.currentDashboard, dashboardDetailInfo: info }
-        : null,
+      currentDashboard: state.currentDashboard ? { ...state.currentDashboard, dashboardDetailInfo: info } : null,
     })),
-
-  // 그룹 항목 관련 액션들
   setGroupItems: (items) => set({ groupItems: items }),
 
   addGroupItem: (item) =>
@@ -118,9 +107,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
 
   updateGroupItem: (id, updates) =>
     set((state) => ({
-      groupItems: state.groupItems.map((item) =>
-        item.groupId === id ? { ...item, ...updates } : item
-      ),
+      groupItems: state.groupItems.map((item) => (item.groupId === id ? { ...item, ...updates } : item)),
     })),
 
   deleteGroupItem: (id) =>
@@ -137,7 +124,6 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     });
   },
 
-  // 집계 항목 관련 액션들
   setAggregatedItems: (items) => set({ aggregatedItems: items }),
 
   addAggregatedItem: (item) =>
@@ -147,16 +133,12 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
 
   updateAggregatedItem: (id, updates) =>
     set((state) => ({
-      aggregatedItems: state.aggregatedItems.map((item) =>
-        item.aggregatedId === id ? { ...item, ...updates } : item
-      ),
+      aggregatedItems: state.aggregatedItems.map((item) => (item.aggregatedId === id ? { ...item, ...updates } : item)),
     })),
 
   deleteAggregatedItem: (id) =>
     set((state) => ({
-      aggregatedItems: state.aggregatedItems.filter(
-        (item) => item.aggregatedId !== id
-      ),
+      aggregatedItems: state.aggregatedItems.filter((item) => item.aggregatedId !== id),
     })),
 
   reorderAggregatedItems: (startIndex, endIndex) => {

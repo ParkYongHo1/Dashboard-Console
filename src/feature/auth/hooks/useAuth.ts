@@ -1,9 +1,9 @@
-import { authService } from "@/services/auth/api";
 import { useCompanyStore } from "@/stores/companyStore";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { auth } from "../api/api";
 
 export const useAuth = () => {
   const isAuthenticated = useCompanyStore((state) => state.isAuthenticated);
@@ -13,7 +13,7 @@ export const useAuth = () => {
   const navigate = useNavigate();
 
   const { mutate: loginMutate, isPending: isLoggingIn } = useMutation({
-    mutationFn: authService.login,
+    mutationFn: auth.login,
     onSuccess: (response) => {
       login(
         {
@@ -37,9 +37,31 @@ export const useAuth = () => {
       }
     },
   });
+
+  const { mutate: logoutMutate, isPending: isLoggingOut } = useMutation({
+    mutationFn: auth.logout,
+    onSuccess: () => {
+      logout();
+      toast.success("로그아웃 되었습니다.");
+      navigate("/login");
+    },
+    onError: () => {
+      logout();
+      toast.success("로그아웃 되었습니다.");
+      navigate("/login");
+    },
+  });
+
   const handleLogout = () => {
-    logout();
-    toast.success("로그아웃 되었습니다.");
+    logoutMutate();
   };
-  return { isAuthenticated, company, loginMutate, isLoggingIn, handleLogout };
+
+  return {
+    isAuthenticated,
+    company,
+    loginMutate,
+    isLoggingIn,
+    handleLogout,
+    isLoggingOut,
+  };
 };

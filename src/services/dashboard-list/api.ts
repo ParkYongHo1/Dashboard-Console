@@ -1,39 +1,20 @@
 import { DashboardListResponse } from "../../types/dashboard-list";
-import {
-  CreateDashboardResponse,
-  DashboardDefaultInfoResponse,
-} from "@/types/dashboard-info";
-import { apiClient } from "@/lib/interceptors";
+import { CreateDashboardResponse, DashboardDefaultInfoResponse } from "@/types/dashboard-info";
+import { apiClient } from "@/shared/lib/interceptors";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export const dashboardService = {
   getList: async (params: { page: number; size: number }) => {
-    const response = await apiClient.get<DashboardListResponse>(
-      `${API_BASE_URL}/api/dashboards`,
-      { params }
-    );
+    const response = await apiClient.get<DashboardListResponse>(`${API_BASE_URL}/api/dashboards`, { params });
 
     return response.data;
   },
-  createDashboard: async (params: {
-    dashboardName: string;
-    tableName: string;
-    dashboardDescription?: string;
-  }) => {
-    const response = await apiClient.post<CreateDashboardResponse>(
-      `${API_BASE_URL}/api/dashboard`,
-      params
-    );
+  createDashboard: async (params: { dashboardName: string; tableName: string; dashboardDescription?: string }) => {
+    const response = await apiClient.post<CreateDashboardResponse>(`${API_BASE_URL}/api/dashboard`, params);
     return response.data;
   },
-  getDashboardDefaultInfo: async (params: {
-    dashboardId: string;
-    status: string;
-  }) => {
-    const response = await apiClient.get<DashboardDefaultInfoResponse>(
-      `${API_BASE_URL}/api/dashboard`,
-      { params }
-    );
+  getDashboardDefaultInfo: async (params: { dashboardId: string; status: string }) => {
+    const response = await apiClient.get<DashboardDefaultInfoResponse>(`${API_BASE_URL}/api/dashboard`, { params });
 
     return response.data;
   },

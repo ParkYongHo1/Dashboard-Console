@@ -83,6 +83,8 @@ export const useCompanyStore = create<CompanyState>()(
           refreshTimer: null,
           isRefreshing: false,
         });
+
+        localStorage.removeItem("company-storage");
       },
 
       updateAccessToken: (accessToken, expiresAt) => {
@@ -145,11 +147,11 @@ export const useCompanyStore = create<CompanyState>()(
       onRehydrateStorage: () => {
         return (state, error) => {
           if (error) {
-            handleSessionExpired(useCompanyStore.getState());
+            handleSessionExpired();
           } else {
             if (state?.isAuthenticated && state?.accessTokenExpiresAt) {
               if (Date.now() >= state.accessTokenExpiresAt) {
-                handleSessionExpired(useCompanyStore.getState());
+                handleSessionExpired();
               } else {
                 setTimeout(() => {
                   state.scheduleTokenRefresh?.();

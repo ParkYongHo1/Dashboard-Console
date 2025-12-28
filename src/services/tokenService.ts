@@ -10,7 +10,7 @@ export const refreshAccessToken = async (set: StateUpdater, get: StateGetter): P
     const { tokenService } = await import("@/services/token/api");
 
     if (!store.refreshToken) {
-      handleSessionExpired(store);
+      handleSessionExpired();
       return;
     }
 
@@ -24,7 +24,7 @@ export const refreshAccessToken = async (set: StateUpdater, get: StateGetter): P
     get().scheduleTokenRefresh();
   } catch {
     set({ isRefreshing: false });
-    handleSessionExpired(store);
+    handleSessionExpired();
+    return;
   }
 };
-
